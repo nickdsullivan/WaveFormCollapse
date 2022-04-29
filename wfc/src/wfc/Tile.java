@@ -24,9 +24,68 @@ public class Tile {
 		}
 	}
 	public void update(types t, int dist) {
-		checkRule( (t) ->{
+		checkRule(possible,t, (inside,outside) ->{
+			switch(outside) {
+			case grass:
+				switch(inside) {
+				case grass:
+					return (float).5;
+				case lightForest:
+					return (float).3;
+				case sand:
+					return (float).2;
+				default:
+					return -1;
+					
+				}
+			case lightForest:
+				switch(inside) {
+				case lightForest:
+					return (float).6;
+				case grass:
+					return (float).4;
+				default:
+					return -1;
+				}
+			case sand:
+				switch(inside) {
+					case shore:
+						return (float).3;
+					case deepWater:
+						
+						return (float).1;
+					case sand:
+						return(float) .4;
+					case grass:
+						return (float).2;
+					default:
+						return -1;
+				}
+			case shore:
+				switch(inside) {
+				case shore:
+					return(float) .4;
+				case deepWater:
+					return(float) .4;
+				case sand:
+					return(float) .2;
+				default:
+					return -1;
+				}
+			case deepWater:
+				switch(inside){
+				case deepWater:
+					return (float) .8;
+				case shore:
+					return(float) .2;
+				default:
+					return -1;
+				}
+			default:
+				return -1;
+			}
 			
-		})
+		});
 		
 	}
 	//Here I collapse the possible states.
@@ -141,7 +200,14 @@ public class Tile {
 		}
 	}
 	//This will increase or decrease depending on the value
-	static void checkRule(types t1, types t2, Ruleable rule) {
-		rule.compare(t2);
+	static void checkRule(Map<types, Float> possible,types t2, Ruleable rule) {
+		float increase = 0;
+		float value;
+		for (types t: possible.keySet()) {
+			value = rule.compare(t,t2);
+			
+			
+		}
+		
 	}
 }
