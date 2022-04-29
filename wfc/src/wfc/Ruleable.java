@@ -1,5 +1,5 @@
 package wfc;
 
 public interface Ruleable {
-	public boolean compare();
+	public float compare(types t);
 }

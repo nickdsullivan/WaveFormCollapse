@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 
 public class GameFrames extends JFrame {
-	public Display a;
+	public Display display;
     GameFrames() {
-        this.a  = new Display();
-        this.add(a);
+        this.display  = new Display();
+        this.add(display);
         this.setTitle("Blobs");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
@@ -18,9 +18,9 @@ public class GameFrames extends JFrame {
         this.setVisible(true);
        
     }
-    public Display getA() {
+    public Display getDisplay() {
  
-    	return a;
+    	return display;
     }
     
 }
