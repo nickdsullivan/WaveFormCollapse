@@ -1,7 +1,7 @@
 package wfc;
 import java.awt.color.*;
 enum types{
-	unknown,grass,lightForest,deepforest,hills,mountains,desert,sand,shore,deepwater
+	unknown,grass,lightForest,sand,shore,deepwater
 }
 
 public class Main {
