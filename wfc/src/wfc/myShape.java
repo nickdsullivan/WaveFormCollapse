@@ -13,9 +13,9 @@ public class myShape {
 	//For non lines.  
 	
 	public myShape(String type, int x, int y, int size) {
-		this.x1 = x+1;
-		this.y1 = y+1;
-		this.size = size-2;
+		this.x1 = x;
+		this.y1 = y;
+		this.size = size;
 		this.type = type;
 		color = new Color(255,255,255);
 		

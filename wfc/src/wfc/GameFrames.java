@@ -11,7 +11,7 @@ public class GameFrames extends JFrame {
     GameFrames() {
         this.display  = new Display();
         this.add(display);
-        this.setTitle("Blobs");
+        this.setTitle("Terrain");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
         this.setLocationRelativeTo(null);

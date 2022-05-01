@@ -8,7 +8,12 @@ public class Tile {
 	//This will have the type as key and probablity that is will show up as the value
 	Map<types, Float> possible;
 	//types [] possible;
-	public  Tile() {
+	public int xCord;
+	public int yCord;
+	boolean isCollapsed = false;
+	public  Tile(int x, int y) {
+		xCord = x;
+		yCord = y;
 		current = types.unknown;
 		possible =  new HashMap<types,Float>();
 		//Equal prob for all but unknown types
@@ -23,17 +28,20 @@ public class Tile {
 			
 		}
 	}
+	public types getCurrent() {
+		return current;
+	}
 	public void update(types t, int dist) {
 		checkRule(possible,t, (inside,outside) ->{
 			switch(outside) {
 			case grass:
 				switch(inside) {
 				case grass:
-					return (float).5;
+					return (float).7;
 				case lightForest:
-					return (float).3;
-				case sand:
 					return (float).2;
+				case sand:
+					return (float).1;
 				default:
 					return -1;
 					
@@ -41,32 +49,32 @@ public class Tile {
 			case lightForest:
 				switch(inside) {
 				case lightForest:
-					return (float).6;
+					return (float).9;
 				case grass:
-					return (float).4;
+					return (float).1;
 				default:
 					return -1;
 				}
 			case sand:
 				switch(inside) {
 					case shore:
-						return (float).3;
+						return (float).2;
 					case deepWater:
 						
-						return (float).1;
+						return (float)-1;
 					case sand:
-						return(float) .4;
+						return(float) .7;
 					case grass:
-						return (float).2;
+						return (float).1;
 					default:
 						return -1;
 				}
 			case shore:
 				switch(inside) {
 				case shore:
-					return(float) .4;
+					return(float) .6;
 				case deepWater:
-					return(float) .4;
+					return(float) .1;
 				case sand:
 					return(float) .2;
 				default:
@@ -75,9 +83,11 @@ public class Tile {
 			case deepWater:
 				switch(inside){
 				case deepWater:
-					return (float) .8;
+					return (float) 1;
 				case shore:
-					return(float) .2;
+					return(float) -.5;
+				case sand:
+					return(float) -1;
 				default:
 					return -1;
 				}
@@ -88,6 +98,11 @@ public class Tile {
 		});
 		
 	}
+	
+	public boolean isCollapsed()
+	{
+		return isCollapsed;
+	}
 	//Here I collapse the possible states.
 	
 	//This is doing weighted picking
@@ -95,7 +110,7 @@ public class Tile {
 	//Now choose a random number and find the smallest float that is bigger than it and thats the tile you select.
 	//Works because floats always add to 1
 	public void collapse() {
-		
+		isCollapsed=true;
 		float floor =0;
 		
 		float min = 2;
@@ -154,7 +169,7 @@ public class Tile {
 		types currMaxURand= currMax;
 		float rand =(float) Math.random();
 		
-		System.out.println(rand);
+		
 		for (types t: possible.keySet()) {
 			
 			if (rand < possible.get(t) && possible.get(t) < minURand) {
@@ -165,7 +180,7 @@ public class Tile {
 		}
 		this.current = currMaxURand;
 		//update the possibles to 0 now
-		System.out.println(this.current);
+		
 		Map <types, Float> temp = new HashMap<types,Float>();
 		for (types b: possible.keySet()) {
 			if (b != this.current) {
@@ -178,6 +193,7 @@ public class Tile {
 			}
 		}
 		possible = temp;
+		//System.out.println("Successfully collapsed Tile: (" + xCord + ", " + yCord +") to " + this.current);
 	}
 	//Get color according to type
 	public Color getColor() {
@@ -191,7 +207,7 @@ public class Tile {
 			return new Color(1,50,32);
 		case shore:
 			return new Color(173,216,230);
-		case deepwater:
+		case deepWater:
 			return Color.BLUE;
 		case sand:
 			return Color.yellow;
@@ -199,15 +215,51 @@ public class Tile {
 			return Color.gray;
 		}
 	}
-	//This will increase or decrease depending on the value
+	//This will increase or decrease depending on the rule passed
+	//Time: O(n) with const -> O(2n)
 	static void checkRule(Map<types, Float> possible,types t2, Ruleable rule) {
 		float increase = 0;
 		float value;
+		float newValue;
+		float zeroIncrease = 0;
+		Map<types, Float> increasing_only = new HashMap<>();
 		for (types t: possible.keySet()) {
 			value = rule.compare(t,t2);
-			
+			if (value < 0) {
+				//increase possible and decrease key in map
+				float diff = value *possible.get(t) * -1;
+				increase += diff;
+				
+				possible.put(t, possible.get(t) - diff);
+			}
+			else {
+				increasing_only.put(t, possible.get(t));
+				if (possible.get(t) == 0) {
+					zeroIncrease += value;
+				}
+			}
 			
 		}
 		
+		//Recomputing is const time so I figure its faster than accessing memory.  Essentially a lookup table anyway
+		for (types t: increasing_only.keySet()) {
+			value = rule.compare(t,t2);
+			value = value + value*zeroIncrease;
+			if(possible.get(t)==0) {
+				value = 0;
+			}
+			//Increases the value of the possible by the proportion of value and total amount of prob. 
+			
+			possible.put(t,possible.get(t) +value*increase);
+		}
+		
+	}
+	
+	public String toString() {
+		String s = "[" + xCord + ", " + yCord + "]  ";
+		for (types t:possible.keySet()) {
+			s+=t +": " +possible.get(t) + "  ";
+		}
+		return s +"\n";
 	}
 }
